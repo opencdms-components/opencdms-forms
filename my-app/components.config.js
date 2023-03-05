@@ -1,4 +1,6 @@
 const path = require('path');
+const { fileLoader } = require('file-loader');
+const { VueLoaderPlugin } = require('vue-loader');
 const { VuetifyLoaderPlugin } = require('vuetify-loader');
 
 module.exports = {
@@ -11,7 +13,7 @@ module.exports = {
     rules: [
       {
         test: /\.vue$/,
-        loader: 'vuetify-loader'
+        loader: 'vue-loader'
       },
       {
         test: /\.sass$/,
@@ -25,8 +27,23 @@ module.exports = {
                 }
             }
         ]
+      },
+      {
+        test: /\.svg$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[name].[ext]',
+              outputPath: 'assets/',
+            },
+          },
+        ],
       }
     ]
   },
-  plugins: [ new VuetifyLoaderPlugin() ]
+  plugins: [
+    new VueLoaderPlugin(),
+    new VuetifyLoaderPlugin()
+  ]
 };
