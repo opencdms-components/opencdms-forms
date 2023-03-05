@@ -263,5 +263,66 @@ npx webpack --config webpack.config.js --mode development
 Make sure there is at least one root-level rule that uses vue-loader and VuetifyLoaderPlugin is applied after VueLoaderPlugin.
 ```
 
-Next: revisit the docs
-https://github.com/vuetifyjs/vuetify-loader
+Revisiting the [vuetify-loader](https://github.com/vuetifyjs/vuetify-loader) docs, it looks like we need to setup [vue-loader](https://vue-loader.vuejs.org/guide/#manual-setup) more fully.
+We don't want to follow the docs and do: `npm install -D vue-loader vue-template-compiler` because that will update our `devDependencies` to `"vue-loader": "^17.0.1"` and (according to [this SO answer](https://stackoverflow.com/a/74718715/1624894))  `vue-loader` 16+ isn't compatible with vue 2.x
+
+Also recall that  `npm list vue-loader` tells us we have `vue-loader@15.10.1` installed by one of or dependencies.
+
+So let's change `'vuetify-loader'` to `'vue-loader'`:
+```bash
+   rules: [
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader'
+      },
+      ...
+   ]
+```
+
+Also add `const { VueLoaderPlugin } = require('vue-loader')` at the top and add ````
+new VueLoaderPlugin()` to the `plugins` list. Before their Vuetify equivalents.
+
+```bash
+npx webpack --config webpack.config.js --mode development
+```
+
+Okay... so I now have a bundle that used `src/components.js` as the entry-point and therefore should contain `Vue`, `vuetify` and `HelloWorld` from `./components/HelloWorld.vue'.
+
+
+**TODO:** See the webpack config example [here](https://vue-loader.vuejs.org/guide/#manual-setup) for processing `css` files and also the `<style>` section of SFC.
+
+
+## Wrapping the Vue component as a web component
+
+Next we're on to: https://github.com/vuejs/vue-web-component-wrapper/
+
+```bash
+npm install @vue/web-component-wrapper --save-dev
+```
+
+```js
+import Vue from 'vue'
+import wrap from '@vue/web-component-wrapper'
+
+const Component = {
+  // any component options
+}
+
+const CustomElement = wrap(Vue, Component)
+
+window.customElements.define('my-element', CustomElement)
+```
+
+Note, we've renamed `webpack.config.js` as `components.config.js` to make sure that the main application's `npm run serve` doesn't attempt to use it. Also, we using `--mode production` because in `development` mode some of the mapping files that are useful for debugging are currently missing.
+
+```bash
+npx webpack --config components.config.js --mode production
+```
+
+Using Python to serve the build in the `dist` folder is currently giving an empty page (with a 0x0 hello-world web component)
+
+```bash
+python3 -m http.server 8080 --directory dist
+```
+
+Trying to serve the main application using `npm run serve` is currently giving an error: `Error: Rule can only have one resource source (provided resource and test + include + exclude)`.
