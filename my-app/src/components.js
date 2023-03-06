@@ -4,7 +4,8 @@
  */
 import Vue from 'vue';
 import wrap from '@vue/web-component-wrapper'
-import vuetify from './plugins/vuetify';
+//import vuetify from './plugins/vuetify';
+import 'vuetify/dist/vuetify.min.css'
 import HelloWorld from './components/HelloWorld.vue';
 
 const CustomElement = wrap(Vue, HelloWorld)
