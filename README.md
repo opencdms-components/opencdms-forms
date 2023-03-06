@@ -324,5 +324,3 @@ Using Python to serve the build in the `dist` folder is currently giving an empt
 ```bash
 python3 -m http.server 8080 --directory dist
 ```
-
-Trying to serve the main application using `npm run serve` is currently giving an error: `Error: Rule can only have one resource source (provided resource and test + include + exclude)`.
